@@ -210,6 +210,24 @@ void Asteroids::CreateAsteroids(const uint num_asteroids)
 	}
 }
 
+// Creates smaller asteroids that are half the size of the original asteroid
+void Asteroids::CreateSmallerAsteroids(const uint num_asteroids, GLVector3f p)
+{
+	for (u int i = 0; i < num_asteroids; i++)
+	{
+		Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("asteroid1");
+		shared_ptr<Sprite> asteroid_sprite
+			= make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
+		asteroid_sprite->SetLoopAnimation(true);
+		shared_ptr<GameObject> asteroid_small = make_shared<Asteroid>();
+		asteroid_small->SetBoundingShape(make_shared<BoundingSphere>(asteroid_small->GetThisPtr(), 5.0f));
+		asteroid_small->SetSprite(asteroid_sprite);
+		asteroid_small->SetScale(0.1f);
+		asteroid_small->SetPosition(p);
+		mGameWorld->AddObject(asteroid_small);
+	}
+}
+
 void Asteroids::CreateGUI()
 {
 	// Add a (transparent) border around the edge of the game display
