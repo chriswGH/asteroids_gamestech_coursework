@@ -142,7 +142,10 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 		mGameWorld->AddObject(explosion);
 		mAsteroidCount--;
 		// Creates the two smaller asteroids when the original asteroid is hit by a bullet
-		CreateSmallerAsteroids(2, object->GetPosition());
+		if (object->GetScale() > 0.1f)
+		{
+			CreateSmallerAsteroids(2, object->GetPosition());
+		}
 		if (mAsteroidCount <= 0) 
 		{ 
 			SetTimer(500, START_NEXT_LEVEL); 
