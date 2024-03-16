@@ -141,6 +141,8 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 		explosion->SetRotation(object->GetRotation());
 		mGameWorld->AddObject(explosion);
 		mAsteroidCount--;
+		// Creates the two smaller asteroids when the original asteroid is hit by a bullet
+		CreateSmallerAsteroids(2, object->GetPosition());
 		if (mAsteroidCount <= 0) 
 		{ 
 			SetTimer(500, START_NEXT_LEVEL); 
@@ -213,7 +215,7 @@ void Asteroids::CreateAsteroids(const uint num_asteroids)
 // Creates smaller asteroids that are half the size of the original asteroid
 void Asteroids::CreateSmallerAsteroids(const uint num_asteroids, GLVector3f p)
 {
-	for (u int i = 0; i < num_asteroids; i++)
+	for (uint i = 0; i < num_asteroids; i++)
 	{
 		Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("asteroid1");
 		shared_ptr<Sprite> asteroid_sprite
