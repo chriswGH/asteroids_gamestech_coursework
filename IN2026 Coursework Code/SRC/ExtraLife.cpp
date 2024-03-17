@@ -26,7 +26,7 @@ void ExtraLife::Render(void)
 	// glScalef(0.5, 0.5, 0.5);
     // Start drawing filled polygons
     glBegin(GL_POLYGON);
-    // Set color to red
+    // Set colour to red
     glColor3f(1.0, 0.0, 0.0);
     // Draw the left side of the heart
     glVertex3f(-1.5, 0.5, 0.0);
