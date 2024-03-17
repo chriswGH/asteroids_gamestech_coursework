@@ -1,5 +1,7 @@
 #include "Asteroid.h"
 #include "Asteroids.h"
+#include "ExtraLife.h"
+#include "Shield.h"
 #include "Animation.h"
 #include "AnimationManager.h"
 #include "GameUtil.h"
@@ -11,6 +13,7 @@
 #include "BoundingSphere.h"
 #include "GUILabel.h"
 #include "Explosion.h"
+
 
 // PUBLIC INSTANCE CONSTRUCTORS ///////////////////////////////////////////////
 
@@ -141,7 +144,7 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 		explosion->SetRotation(object->GetRotation());
 		mGameWorld->AddObject(explosion);
 		mAsteroidCount--;
-		// Creates the two smaller asteroids when the original asteroid is hit by a bullet
+		// Creates the two smaller asteroids only when the large (original) asteroid is hit by a bullet
 		if (object->GetScale() > 0.1f)
 		{
 			CreateSmallerAsteroids(2, object->GetPosition());
@@ -233,6 +236,22 @@ void Asteroids::CreateSmallerAsteroids(const uint num_asteroids, GLVector3f p)
 	}
 }
 
+// Creates extra life pickups
+void Asteroids::CreateExtraLife()
+{
+	mExtraLife = make_shared<ExtraLife>();
+	mExtraLife->SetBoundingShape(make_shared<BoundingSphere>(mExtraLife->GetThisPtr(), 7.5f));
+	mGameWorld->AddObject(mExtraLife);
+}
+
+// Creates shield pickups
+void Asteroids::CreateShield()
+{
+	mShield = make_shared<Shield>();
+	mShield->SetBoundingShape(make_shared<BoundingSphere>(mShield->GetThisPtr(), 7.5f));
+	mGameWorld->AddObject(mShield);
+}
+
 void Asteroids::CreateGUI()
 {
 	// Add a (transparent) border around the edge of the game display
@@ -314,7 +333,3 @@ shared_ptr<GameObject> Asteroids::CreateExplosion()
 	explosion->Reset();
 	return explosion;
 }
-
-
-
-
