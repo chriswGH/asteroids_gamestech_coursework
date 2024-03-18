@@ -63,8 +63,15 @@ void Asteroids::Start()
 
 	// Create a spaceship and add it to the world
 	mGameWorld->AddObject(CreateSpaceship());
+
 	// Create some asteroids and add them to the world
-	CreateAsteroids(10);
+	CreateAsteroids(8);
+
+	// Creates an extra life pick-up and adds it to the world
+	CreateExtraLife();
+
+	// Creates a shield pick-up and adds it to the world
+	CreateShield();
 
 	//Create the GUI
 	CreateGUI();
