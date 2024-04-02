@@ -173,6 +173,10 @@ void Asteroids::OnTimer(int value)
 	if (value == SHOW_GAME_OVER)
 	{
 		mGameOverLabel->SetVisible(true);
+		mHighScoreLabel->SetVisible(true);
+		mHighScoreTopLabel->SetVisible(true);
+		mHighScoreMidLabel->SetVisible(true);
+		mHighScoreBotLabel->SetVisible(true);
 	}
 
 }
@@ -262,12 +266,44 @@ void Asteroids::CreateGUI()
 	mGameOverLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
 	// Set the visibility of the label to false (hidden)
 	mGameOverLabel->SetVisible(false);
+
+	mHighScoreLabel = shared_ptr<GUILabel>(new GUILabel("High Scores"));
+	mHighScoreLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_LEFT);
+	mHighScoreLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
+	mHighScoreLabel->SetVisible(false);
+
+	mHighScoreTopLabel = shared_ptr<GUILabel>(new GUILabel("1: Score: " + std::to_string(mHighScoreTopFromFile)));
+	mHighScoreTopLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_LEFT);
+	mHighScoreTopLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
+	mHighScoreTopLabel->SetVisible(false);
+
+	mHighScoreMidLabel = shared_ptr<GUILabel>(new GUILabel("2: Score: " + std::to_string(mHighScoreMidFromFile)));
+	mHighScoreMidLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_LEFT);
+	mHighScoreMidLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
+	mHighScoreMidLabel->SetVisible(false);
+
+	mHighScoreBotLabel = shared_ptr<GUILabel>(new GUILabel("3: Score: " + std::to_string(mHighScoreBotFromFile)));
+	mHighScoreBotLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_LEFT);
+	mHighScoreBotLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
+	mHighScoreBotLabel->SetVisible(false);
+
 	// Add the GUILabel to the GUIContainer  
 	shared_ptr<GUIComponent> game_over_component
 		= static_pointer_cast<GUIComponent>(mGameOverLabel);
 	mGameDisplay->GetContainer()->AddComponent(game_over_component, GLVector2f(0.5f, 0.5f));
 
-}
+	shared_ptr<GUIComponent> high_score_component
+	= static_pointer_cast<GUIComponent>(mHighScoreLabel);
+	mGameDisplay->GetContainer()->AddComponent(high_score_component, GLVector2f(0.4f, 0.7f));
+	shared_ptr<GUIComponent> high_score_component_top
+	= static_pointer_cast<GUIComponent>(mHighScoreTopLabel);
+	mGameDisplay->GetContainer()->AddComponent(high_score_component_top, GLVector2f(0.4f, 0.65f));
+	shared_ptr<GUIComponent> high_score_component_mid
+	= static_pointer_cast<GUIComponent>(mHighScoreMidLabel);
+	mGameDisplay->GetContainer()->AddComponent(high_score_component_mid, GLVector2f(0.4f, 0.6f));
+	shared_ptr<GUIComponent> high_score_component_bot
+	= static_pointer_cast<GUIComponent>(mHighScoreBotLabel);
+	mGameDisplay->GetContainer()->AddComponent(high_score_component_bot, GLVector2f(0.4f, 0.55f));
 
 void Asteroids::OnScoreChanged(int score)
 {
