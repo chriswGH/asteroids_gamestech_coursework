@@ -1,3 +1,6 @@
+#include <fstream>
+#include <iostream>
+#include <iomanip>
 #include "Asteroid.h"
 #include "Asteroids.h"
 #include "Animation.h"
@@ -57,6 +60,9 @@ void Asteroids::Start()
 	Animation *explosion_anim = AnimationManager::GetInstance().CreateAnimationFromFile("explosion", 64, 1024, 64, 64, "explosion_fs.png");
 	Animation *asteroid1_anim = AnimationManager::GetInstance().CreateAnimationFromFile("asteroid1", 128, 8192, 128, 128, "asteroid1_fs.png");
 	Animation *spaceship_anim = AnimationManager::GetInstance().CreateAnimationFromFile("spaceship", 128, 128, 128, 128, "spaceship_fs.png");
+
+	// Reads the high scores from the text file
+	ReadHighScoresFromFile();
 
 	// Create a spaceship and add it to the world
 	mGameWorld->AddObject(CreateSpaceship());
@@ -177,6 +183,9 @@ void Asteroids::OnTimer(int value)
 		mHighScoreTopLabel->SetVisible(true);
 		mHighScoreMidLabel->SetVisible(true);
 		mHighScoreBotLabel->SetVisible(true);
+
+
+		SaveHighScoresToFile();
 	}
 
 }
@@ -259,7 +268,6 @@ void Asteroids::ReadHighScoresFromFile()
 		ifs >> HighScoresFromFile;
 		mHighScoreBotFromFile = HighScoresFromFile;
 	}
-
 	ifs.close();
 }
 
@@ -331,16 +339,16 @@ void Asteroids::CreateGUI()
 
 	shared_ptr<GUIComponent> high_score_component
 		= static_pointer_cast<GUIComponent>(mHighScoreLabel);
-	mGameDisplay->GetContainer()->AddComponent(high_score_component, GLVector2f(0.4f, 0.7f));
+	mGameDisplay->GetContainer()->AddComponent(high_score_component, GLVector2f(0.35f, 0.7f));
 	shared_ptr<GUIComponent> high_score_component_top
 		= static_pointer_cast<GUIComponent>(mHighScoreTopLabel);
-	mGameDisplay->GetContainer()->AddComponent(high_score_component_top, GLVector2f(0.4f, 0.65f));
+	mGameDisplay->GetContainer()->AddComponent(high_score_component_top, GLVector2f(0.35f, 0.65f));
 	shared_ptr<GUIComponent> high_score_component_mid
 		= static_pointer_cast<GUIComponent>(mHighScoreMidLabel);
-	mGameDisplay->GetContainer()->AddComponent(high_score_component_mid, GLVector2f(0.4f, 0.6f));
+	mGameDisplay->GetContainer()->AddComponent(high_score_component_mid, GLVector2f(0.35f, 0.6f));
 	shared_ptr<GUIComponent> high_score_component_bot
 		= static_pointer_cast<GUIComponent>(mHighScoreBotLabel);
-	mGameDisplay->GetContainer()->AddComponent(high_score_component_bot, GLVector2f(0.4f, 0.55f));
+	mGameDisplay->GetContainer()->AddComponent(high_score_component_bot, GLVector2f(0.35f, 0.55f));
 }
 
 void Asteroids::OnScoreChanged(int score)

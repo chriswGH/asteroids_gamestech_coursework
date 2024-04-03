@@ -60,9 +60,9 @@ private:
 	uint mLevel;
 	uint mAsteroidCount;
 
-	int mHighScoreTopFromFile = 0;
-	int mHighScoreMidFromFile = 0;
-	int mHighScoreBotFromFile = 0;
+	int mHighScoreTopFromFile;
+	int mHighScoreMidFromFile;
+	int mHighScoreBotFromFile;
 
 	void ResetSpaceship();
 	shared_ptr<GameObject> CreateSpaceship();
