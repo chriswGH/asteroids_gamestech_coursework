@@ -89,6 +89,42 @@ void Asteroids::Stop()
 	GameSession::Stop();
 }
 
+// Reads from the HighScores.txt file
+void Asteroids::ReadHighScoresFromFile()
+{
+	int HighScoresFromFile;
+	ifstream ifs;
+	ifs.open("HighScores.txt");
+	if (ifs.fail()) {
+		// Print in the terminal if the file fails to open
+		cout << "File failed to open" << endl;
+	}
+	else {
+		// Print in the terminal if the file successfully opens
+		cout << "File opened successfully" << endl;
+
+		// Reads the first three high scores in order of highest to lowest
+		ifs >> HighScoresFromFile;
+		mHighScoreTopFromFile = HighScoresFromFile;
+		ifs >> HighScoresFromFile;
+		mHighScoreMidFromFile = HighScoresFromFile;
+		ifs >> HighScoresFromFile;
+		mHighScoreBotFromFile = HighScoresFromFile;
+	}
+	ifs.close();
+}
+
+//Saves scores to the HighScores.txt file
+void Asteroids::SaveHighScoresToFile()
+{
+	ofstream fout;
+	fout.open("HighScores.txt");
+	fout << mHighScoreTopFromFile << endl;
+	fout << mHighScoreMidFromFile << endl;
+	fout << mHighScoreBotFromFile << endl;
+	fout.close();
+}
+
 // PUBLIC INSTANCE METHODS IMPLEMENTING IKeyboardListener /////////////////////
 
 void Asteroids::OnKeyPressed(uchar key, int x, int y)
@@ -184,10 +220,45 @@ void Asteroids::OnTimer(int value)
 		mHighScoreMidLabel->SetVisible(true);
 		mHighScoreBotLabel->SetVisible(true);
 
-
+		if (mHighScoreTopFromFile < mCurrentScore) {
+			std::ostringstream h_msg_stream;
+			h_msg_stream << "1st: New High Score: " << mCurrentScore;
+			mHighScoreBotFromFile = mHighScoreMidFromFile;
+			mHighScoreMidFromFile = mHighScoreTopFromFile;
+			mHighScoreTopFromFile = mCurrentScore;
+			std::string h_score_msg = h_msg_stream.str();
+			mHighScoreTopLabel->SetText(h_score_msg);
+			RefreshHighScores(mHighScoreMidLabel, "2nd: Score: " + std::to_string(mHighScoreMidFromFile));
+			RefreshHighScores(mHighScoreBotLabel, "3rd: Score: " + std::to_string(mHighScoreBotFromFile));
+		}
+		else if (mHighScoreMidFromFile < mCurrentScore) {
+			std::ostringstream h_msg_stream;
+			h_msg_stream << "2nd: Score: " << mCurrentScore;
+			mHighScoreBotFromFile = mHighScoreMidFromFile;
+			mHighScoreMidFromFile = mCurrentScore;
+			std::string h_score_msg = h_msg_stream.str();
+			mHighScoreMidLabel->SetText(h_score_msg);
+			RefreshHighScores(mHighScoreBotLabel, "3rd: Score: " + std::to_string(mHighScoreBotFromFile));
+		}
+		else if (mHighScoreBotFromFile < mCurrentScore) {
+			std::ostringstream h_msg_stream;
+			h_msg_stream << "3rd: Your Score: " << mCurrentScore;
+			mHighScoreBotFromFile = mCurrentScore;
+			std::string h_score_msg = h_msg_stream.str();
+			mHighScoreBotLabel->SetText(h_score_msg);
+		}
+		//else if (mHighScoreTopFromFile == mCurrentScore || mHighScoreMidFromFile == mCurrentScore || mHighScoreBotFromFile == mCurrentScore) {
+		//	cout << "Did not beat an existing score" << endl;
+		//}
 		SaveHighScoresToFile();
 	}
+}
 
+void Asteroids::RefreshHighScores(shared_ptr<GUILabel> RefreshGUILabel, string value) {
+	std::ostringstream h_msg_stream;
+	h_msg_stream << value;
+	std::string h_score_msg = h_msg_stream.str();
+	RefreshGUILabel->SetText(h_score_msg);
 }
 
 // PROTECTED INSTANCE METHODS /////////////////////////////////////////////////
@@ -246,41 +317,7 @@ void Asteroids::CreateSmallerAsteroids(const uint num_asteroids, GLVector3f p)
 	}
 }
 
-// Reads from the HighScores.txt file
-void Asteroids::ReadHighScoresFromFile()
-{
-	int HighScoresFromFile;
-	ifstream ifs;
-	ifs.open("HighScores.txt");
-	if (ifs.fail()) {
-		// Print in the terminal if the file fails to open
-		cout << "File failed to open" << endl;
-	}
-	else {
-		// Print in the terminal if the file successfully opens
-		cout << "File opened successfully" << endl;
 
-		// Reads the first three high scores in order of highest to lowest
-		ifs >> HighScoresFromFile;
-		mHighScoreTopFromFile = HighScoresFromFile;
-		ifs >> HighScoresFromFile;
-		mHighScoreMidFromFile = HighScoresFromFile;
-		ifs >> HighScoresFromFile;
-		mHighScoreBotFromFile = HighScoresFromFile;
-	}
-	ifs.close();
-}
-
-//Saves scores to the HighScores.txt file
-void Asteroids::SaveHighScoresToFile()
-{
-	ofstream fout;
-	fout.open("HighScores.txt");
-	fout << mHighScoreTopFromFile << endl;
-	fout << mHighScoreMidFromFile << endl;
-	fout << mHighScoreBotFromFile << endl;
-	fout.close();
-}
 
 void Asteroids::CreateGUI()
 {
@@ -317,17 +354,17 @@ void Asteroids::CreateGUI()
 	mHighScoreLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
 	mHighScoreLabel->SetVisible(false);
 
-	mHighScoreTopLabel = shared_ptr<GUILabel>(new GUILabel("1: Score: " + std::to_string(mHighScoreTopFromFile)));
+	mHighScoreTopLabel = shared_ptr<GUILabel>(new GUILabel("1st: Score: " + std::to_string(mHighScoreTopFromFile)));
 	mHighScoreTopLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_LEFT);
 	mHighScoreTopLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
 	mHighScoreTopLabel->SetVisible(false);
 
-	mHighScoreMidLabel = shared_ptr<GUILabel>(new GUILabel("2: Score: " + std::to_string(mHighScoreMidFromFile)));
+	mHighScoreMidLabel = shared_ptr<GUILabel>(new GUILabel("2nd: Score: " + std::to_string(mHighScoreMidFromFile)));
 	mHighScoreMidLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_LEFT);
 	mHighScoreMidLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
 	mHighScoreMidLabel->SetVisible(false);
 
-	mHighScoreBotLabel = shared_ptr<GUILabel>(new GUILabel("3: Score: " + std::to_string(mHighScoreBotFromFile)));
+	mHighScoreBotLabel = shared_ptr<GUILabel>(new GUILabel("3rd: Score: " + std::to_string(mHighScoreBotFromFile)));
 	mHighScoreBotLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_LEFT);
 	mHighScoreBotLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
 	mHighScoreBotLabel->SetVisible(false);
@@ -353,6 +390,7 @@ void Asteroids::CreateGUI()
 
 void Asteroids::OnScoreChanged(int score)
 {
+	mCurrentScore = score;
 	// Format the score message using an string-based stream
 	std::ostringstream msg_stream;
 	msg_stream << "Score: " << score;
@@ -396,7 +434,3 @@ shared_ptr<GameObject> Asteroids::CreateExplosion()
 	explosion->Reset();
 	return explosion;
 }
-
-
-
-

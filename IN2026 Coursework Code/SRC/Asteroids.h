@@ -60,9 +60,10 @@ private:
 	uint mLevel;
 	uint mAsteroidCount;
 
-	int mHighScoreTopFromFile;
-	int mHighScoreMidFromFile;
-	int mHighScoreBotFromFile;
+	int mCurrentScore = 0;
+	int mHighScoreTopFromFile = 0;
+	int mHighScoreMidFromFile = 0;
+	int mHighScoreBotFromFile = 0;
 
 	void ResetSpaceship();
 	shared_ptr<GameObject> CreateSpaceship();
@@ -71,6 +72,7 @@ private:
 	void CreateSmallerAsteroids(const uint num_asteroids, GLVector3f p);
 	void ReadHighScoresFromFile();
 	void SaveHighScoresToFile();
+	void RefreshHighScores(shared_ptr<GUILabel> RefreshGUILabel, string value);
 	shared_ptr<GameObject> CreateExplosion();
 	
 	const static uint SHOW_GAME_OVER = 0;
