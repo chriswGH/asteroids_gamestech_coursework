@@ -14,6 +14,7 @@
 #include "BoundingSphere.h"
 #include "GUILabel.h"
 #include "Explosion.h"
+#include "DemoSpaceship.h"
 
 // PUBLIC INSTANCE CONSTRUCTORS ///////////////////////////////////////////////
 
@@ -23,6 +24,7 @@ Asteroids::Asteroids(int argc, char *argv[])
 {
 	mLevel = 0;
 	mAsteroidCount = 0;
+	mGameStarted = false;
 }
 
 /** Destructor. */
@@ -65,7 +67,12 @@ void Asteroids::Start()
 	ReadHighScoresFromFile();
 
 	// Create a spaceship and add it to the world
-	mGameWorld->AddObject(CreateSpaceship());
+	mGameWorld->AddObject(CreateSpaceship()); // Comment out when changing to demo spaceship
+
+	// Create a demo spaceship and add it to the world
+	mGameWorld->AddObject(CreateDemoSpaceship());
+	SetTimer(500, DEMOSPACESHIP_SHOOT);
+
 	// Create some asteroids and add them to the world
 	CreateAsteroids(10);
 
@@ -129,6 +136,31 @@ void Asteroids::SaveHighScoresToFile()
 
 void Asteroids::OnKeyPressed(uchar key, int x, int y)
 {
+	if (!mGameStarted)
+	{
+		switch (key)
+		{
+		case ' ':
+			// Create a spaceship and add it to the world
+			mGameWorld->AddObject(CreateSpaceship());
+
+			mGameStarted = true;
+			mStartGameLabel->SetVisible(false);
+			mLivesLabel->SetVisible(true);
+			mScoreLabel->SetVisible(true);
+
+			// Remove demo spaceship from the world
+			mGameWorld->FlagForRemoval(mDemoSpaceship);
+
+			// Reset the lives and score from the demo
+			mScoreKeeper.mScore = 0;
+			mPlayer.mLives = 3;
+
+			break;
+		default:
+			break;
+		}
+	}
 	switch (key)
 	{
 	case ' ':
@@ -193,6 +225,14 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 			SetTimer(500, START_NEXT_LEVEL); 
 		}
 	}
+	if (object->GetType() == GameObjectType("DemoSpaceship"))
+	{
+		shared_ptr<GameObject> explosion = CreateExplosion();
+		explosion->SetPosition(mDemoSpaceship->GetPosition());
+		explosion->SetRotation(mDemoSpaceship->GetRotation());
+		mGameWorld->AddObject(explosion);
+		SetTimer(500, DEMOSPACESHIP_RESPAWN);
+	}
 }
 
 // PUBLIC INSTANCE METHODS IMPLEMENTING ITimerListener ////////////////////////
@@ -252,6 +292,23 @@ void Asteroids::OnTimer(int value)
 		//}
 		SaveHighScoresToFile();
 	}
+	if (value == DEMOSPACESHIP_SHOOT)
+	{
+		if (!mGameStarted)
+		{
+			mDemoSpaceship->Thrust(rand() % 10 + (2));
+			mDemoSpaceship->Rotate(rand() % 120 + (-100));
+			mDemoSpaceship->Shoot();
+			SetTimer(600, DEMOSPACESHIP_SHOOT);
+		}
+	}
+
+	if (value == DEMOSPACESHIP_RESPAWN)
+	{
+		if (!mGameStarted) {
+			mGameWorld->AddObject(CreateDemoSpaceship());
+		}
+	}
 }
 
 void Asteroids::RefreshHighScores(shared_ptr<GUILabel> RefreshGUILabel, string value) {
@@ -279,6 +336,26 @@ shared_ptr<GameObject> Asteroids::CreateSpaceship()
 	mSpaceship->Reset();
 	// Return the spaceship so it can be added to the world
 	return mSpaceship;
+
+}
+
+shared_ptr<GameObject> Asteroids::CreateDemoSpaceship()
+{
+	// Create a raw pointer to a spaceship that can be converted to
+	// shared_ptrs of different types because GameWorld implements IRefCount
+	mDemoSpaceship = make_shared<DemoSpaceship>();
+	mDemoSpaceship->SetBoundingShape(make_shared<BoundingSphere>(mDemoSpaceship->GetThisPtr(), 4.0f));
+	shared_ptr<Shape> bullet_shape = make_shared<Shape>("bullet.shape");
+	mDemoSpaceship->SetDemoBulletShape(bullet_shape);
+	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("spaceship");
+	shared_ptr<Sprite> spaceship_sprite =
+		make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
+	mDemoSpaceship->SetSprite(spaceship_sprite);
+	mDemoSpaceship->SetScale(0.1f);
+	// Reset spaceship back to centre of the world
+	mDemoSpaceship->Reset();
+	// Return the spaceship so it can be added to the world
+	return mDemoSpaceship;
 
 }
 
@@ -340,7 +417,7 @@ void Asteroids::CreateGUI()
 	shared_ptr<GUIComponent> lives_component = static_pointer_cast<GUIComponent>(mLivesLabel);
 	mGameDisplay->GetContainer()->AddComponent(lives_component, GLVector2f(0.0f, 0.0f));
 
-	// Create a new GUILabel and wrap it up in a shared_ptr
+	// Create a new GUILabel for ending the game and wrap it up in a shared_ptr
 	mGameOverLabel = shared_ptr<GUILabel>(new GUILabel("GAME OVER"));
 	// Set the horizontal alignment of the label to GUI_HALIGN_CENTER
 	mGameOverLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
@@ -348,6 +425,15 @@ void Asteroids::CreateGUI()
 	mGameOverLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
 	// Set the visibility of the label to false (hidden)
 	mGameOverLabel->SetVisible(false);
+
+	// Create a new GUILabel for starting the game and wrap it up in a shared_ptr
+	mStartGameLabel = make_shared<GUILabel>("PRESS SPACE TO START");
+	// Set the horizontal alignment of the label to GUI_VALIGN_CENTER
+	mStartGameLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	// Set the vertical alignment of the label to GUI_VALIGN_MIDDLE
+	mStartGameLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
+	// Set the visibility of the label to false (true)
+	mStartGameLabel->SetVisible(true);
 
 	mHighScoreLabel = shared_ptr<GUILabel>(new GUILabel("High Scores"));
 	mHighScoreLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_LEFT);
@@ -373,6 +459,10 @@ void Asteroids::CreateGUI()
 	shared_ptr<GUIComponent> game_over_component
 		= static_pointer_cast<GUIComponent>(mGameOverLabel);
 	mGameDisplay->GetContainer()->AddComponent(game_over_component, GLVector2f(0.5f, 0.5f));
+
+	shared_ptr<GUIComponent> start_demo_component 
+		= static_pointer_cast<GUIComponent>(mStartGameLabel);
+	mGameDisplay->GetContainer()->AddComponent(start_demo_component, GLVector2f(0.5f, 0.7f));
 
 	shared_ptr<GUIComponent> high_score_component
 		= static_pointer_cast<GUIComponent>(mHighScoreLabel);

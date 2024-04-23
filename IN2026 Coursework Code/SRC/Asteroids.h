@@ -12,6 +12,7 @@
 
 class GameObject;
 class Spaceship;
+class DemoSpaceship;
 class GUILabel;
 
 class Asteroids : public GameSession, public IKeyboardListener, public IGameWorldListener, public IScoreListener, public IPlayerListener
@@ -49,9 +50,11 @@ public:
 
 private:
 	shared_ptr<Spaceship> mSpaceship;
+	shared_ptr<DemoSpaceship> mDemoSpaceship;
 	shared_ptr<GUILabel> mScoreLabel;
 	shared_ptr<GUILabel> mLivesLabel;
 	shared_ptr<GUILabel> mGameOverLabel;
+	shared_ptr<GUILabel> mStartGameLabel;
 	shared_ptr<GUILabel> mHighScoreLabel;
 	shared_ptr<GUILabel> mHighScoreTopLabel;
 	shared_ptr<GUILabel> mHighScoreMidLabel;
@@ -67,6 +70,7 @@ private:
 
 	void ResetSpaceship();
 	shared_ptr<GameObject> CreateSpaceship();
+	shared_ptr<GameObject> CreateDemoSpaceship();
 	void CreateGUI();
 	void CreateAsteroids(const uint num_asteroids);
 	void CreateSmallerAsteroids(const uint num_asteroids, GLVector3f p);
@@ -78,9 +82,12 @@ private:
 	const static uint SHOW_GAME_OVER = 0;
 	const static uint START_NEXT_LEVEL = 1;
 	const static uint CREATE_NEW_PLAYER = 2;
+	const static uint DEMOSPACESHIP_SHOOT = 4;
+	const static uint DEMOSPACESHIP_RESPAWN = 5;
 
 	ScoreKeeper mScoreKeeper;
 	Player mPlayer;
+	bool mGameStarted;
 };
 
 #endif

@@ -39,9 +39,10 @@ public:
 			(*lit)->OnPlayerKilled(mLives);
 		}
 	}
+	
+	int mLives;
 
 private:
-	int mLives;
 
 	typedef std::list< shared_ptr<IPlayerListener> > PlayerListenerList;
 

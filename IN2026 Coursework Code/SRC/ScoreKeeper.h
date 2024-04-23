@@ -38,8 +38,9 @@ public:
 		}
 	}
 
-private:
 	int mScore;
+
+private:
 
 	typedef std::list< shared_ptr<IScoreListener> > ScoreListenerList;
 
