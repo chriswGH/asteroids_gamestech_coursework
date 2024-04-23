@@ -67,7 +67,7 @@ void Asteroids::Start()
 	ReadHighScoresFromFile();
 
 	// Create a spaceship and add it to the world
-	mGameWorld->AddObject(CreateSpaceship()); // Comment out when changing to demo spaceship
+	//mGameWorld->AddObject(CreateSpaceship()); // Comment out when changing to demo spaceship
 
 	// Create a demo spaceship and add it to the world
 	mGameWorld->AddObject(CreateDemoSpaceship());
@@ -404,6 +404,7 @@ void Asteroids::CreateGUI()
 	mScoreLabel = make_shared<GUILabel>("Score: 0");
 	// Set the vertical alignment of the label to GUI_VALIGN_TOP
 	mScoreLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mScoreLabel->SetVisible(false);
 	// Add the GUILabel to the GUIComponent  
 	shared_ptr<GUIComponent> score_component
 		= static_pointer_cast<GUIComponent>(mScoreLabel);
@@ -413,6 +414,7 @@ void Asteroids::CreateGUI()
 	mLivesLabel = make_shared<GUILabel>("Lives: 3");
 	// Set the vertical alignment of the label to GUI_VALIGN_BOTTOM
 	mLivesLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_BOTTOM);
+	mLivesLabel->SetVisible(false);
 	// Add the GUILabel to the GUIComponent  
 	shared_ptr<GUIComponent> lives_component = static_pointer_cast<GUIComponent>(mLivesLabel);
 	mGameDisplay->GetContainer()->AddComponent(lives_component, GLVector2f(0.0f, 0.0f));
